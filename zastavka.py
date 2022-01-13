@@ -149,7 +149,7 @@ def registration(screen):
     input_boxes = [input_box1, input_box2]
     done = False
     slovar = {}
-    
+
     while not done:
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -184,7 +184,7 @@ def registration(screen):
                                                             password, count) VALUES(?, ?, ?, ?);''', kortej)
                             con.commit()
 
-                            start_screen(screen)
+                    start_screen(screen)
 
             screen.fill((30, 30, 30))
             screen.blit(log, intro_rect)
@@ -193,7 +193,7 @@ def registration(screen):
             button(screen, ret, 'Регистрация/Вход')
             rect = pygame.Rect(180, 380, 140, 32)
             button(screen, rect, 'Выход', (385, 215))
-             
+
             for box in input_boxes:
                 box.handle_event(event)
         for box in input_boxes:
@@ -209,8 +209,8 @@ def start_screen(screen):
                   "нажимайте кнопки <<влево>> и <<вправо>>,",
                   "чтобы обходить препятствия и получать",
                   "кислород для жизни."]
-    
-    #buttnos (mne len' perecluchat rascladky)
+
+    # buttnos (mne len' perecluchat rascladky)
     button, button1 = pygame.Rect(145, 100, 200, 50), pygame.Rect(145, 200, 200, 50)
     button2, button3 = pygame.Rect(145, 300, 200, 50), pygame.Rect(145, 400, 200, 50)
 
@@ -352,9 +352,10 @@ def choose_level(screen, fon, text_coord, font):
 
 
 class Air(pygame.sprite.Sprite):
-    def __init__(self, size, image, group, i, j, file):
+    def __init__(self, size, image, group, i, j, file, level):
         super().__init__(group)
         self.image = image  # и размеры
+        self.level = level
         self.rect = self.image.get_rect()
         self.rect.x = i * 40
         self.i = i
@@ -364,12 +365,13 @@ class Air(pygame.sprite.Sprite):
 
     def update(self):
         self.rect = self.rect.move(random.randrange(3) - 1,
-                                   random.randrange(3) - 3)
+                                   -1 * self.level)
 
 
 class Angry_fish(pygame.sprite.Sprite):
-    def __init__(self, size, image, group, i, j, file):
+    def __init__(self, size, image, group, i, j, file, level):
         super().__init__(group)
+        self.level = level
         self.image = image  # и размеры
         self.rect = self.image.get_rect()
         self.rect.x = i * 40
@@ -388,12 +390,13 @@ class Angry_fish(pygame.sprite.Sprite):
         self.cou += 1
         if self.cou > 3:
             self.cou = 0
-        self.rect = self.rect.move(0, random.randrange(3) - 3)
+        self.rect = self.rect.move(0, -1 * self.level)
 
 
 class Fish(pygame.sprite.Sprite):
-    def __init__(self, size, image, group, i, j, file):
+    def __init__(self, size, image, group, i, j, file, level):
         super().__init__(group)
+        self.level = level
         self.image = image  # и размеры
         self.rect = self.image.get_rect()
         self.rect.x = i * 40
@@ -412,7 +415,7 @@ class Fish(pygame.sprite.Sprite):
         self.cou += 1
         if self.cou > 4:
             self.cou = 0
-        self.rect = self.rect.move(0, random.randrange(3) - 3)
+        self.rect = self.rect.move(0, -1 * self.level)
 
 
 def vozduh():
@@ -495,7 +498,7 @@ class Character(pygame.sprite.Sprite):
             ochki()
 
 
-def nadpisi(string, intro_rect,sstring, iintro_rect, sprite, sprites, ret,
+def nadpisi(string, intro_rect, sstring, iintro_rect, sprite, sprites, ret,
             sprut, spru, stroka, rectal):
     draw(screen)
     pygame.draw.rect(screen, pygame.Color('lightblue'), ret)
@@ -528,18 +531,18 @@ def main(screen, level):
         if stena[i] == '*':
             image = load_image('air.png', -1)
             image = pygame.transform.scale(image, (40, 40))
-            Air(size, image, all_sprites, i, 0, file)
-            Air(size, image, airs, i, 0, file)
+            Air(size, image, all_sprites, i, 0, file, level)
+            Air(size, image, airs, i, 0, file, level)
         if stena[i] == '+':
             image3 = load_image('fish1.png', -1)
             image3 = pygame.transform.scale(image3, (40, 40))
-            Fish(size, image3, all_sprites, i, 0, file)
-            Fish(size, image3, fish, i, 0, file)
+            Fish(size, image3, all_sprites, i, 0, file, level)
+            Fish(size, image3, fish, i, 0, file, level)
         if stena[i] == '&':
             image2 = load_image('fishh1.png', -1)
             image2 = pygame.transform.scale(image2, (40, 40))
-            Angry_fish(size, image2, all_sprites, i, 0, file)
-            Angry_fish(size, image2, angry, i, 0, file)
+            Angry_fish(size, image2, all_sprites, i, 0, file, level)
+            Angry_fish(size, image2, angry, i, 0, file, level)
 
     image = load_image("chel.png", -1)
     image = pygame.transform.scale(image, (45, 85))
@@ -577,18 +580,18 @@ def main(screen, level):
                 if stena[i] == '*':
                     image = load_image('air.png', -1)
                     image = pygame.transform.scale(image, (40, 40))
-                    Air(size, image, all_sprites, i, 0, file)
-                    Air(size, image, airs, i, 0, file)
+                    Air(size, image, all_sprites, i, 0, file, level)
+                    Air(size, image, airs, i, 0, file, level)
                 if stena[i] == '+':
                     image3 = load_image('fish1.png', -1)
                     image3 = pygame.transform.scale(image3, (40, 40))
-                    Fish(size, image3, all_sprites, i, 0, file)
-                    Fish(size, image3, fish, i, 0, file)
+                    Fish(size, image3, all_sprites, i, 0, file, level)
+                    Fish(size, image3, fish, i, 0, file, level)
                 if stena[i] == '&':
                     image2 = load_image('fishh1.png', -1)
                     image2 = pygame.transform.scale(image2, (40, 40))
-                    Angry_fish(size, image2, all_sprites, i, 0, file)
-                    Angry_fish(size, image2, angry, i, 0, file)
+                    Angry_fish(size, image2, all_sprites, i, 0, file, level)
+                    Angry_fish(size, image2, angry, i, 0, file, level)
         now = timer()
         if now > deadline:
             au -= 5
@@ -628,7 +631,6 @@ def main(screen, level):
         pygame.display.flip()
         clock.tick(FPS)
         vrema += 1
-        
 
 
 if __name__ == '__main__':
