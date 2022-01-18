@@ -664,6 +664,7 @@ def main(screen, level):
                 elif event.key == pygame.K_UP:
                     sprite.update('up', au)
         sprite.update('sas', au)
+        # comment
         nadpisi(string, intro_rect, sstring, iintro_rect, sprite, sprites, ret,
                 sprut, spru, stroka, rectal)
         sstring = font.render(f'Запас кислорода: {au}/100', 1, pygame.Color('darkblue'))
