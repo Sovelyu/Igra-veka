@@ -10,7 +10,8 @@ import sqlite3
 def draw(screen):
     fon = pygame.transform.scale(load_image('backg.png'), (500, 500))
     screen.blit(fon, (0, 0))
-    
+
+
 def load_image(name, colorkey=None):
     fullname = os.path.join('data', name)
     image = pygame.image.load(fullname)
@@ -20,6 +21,7 @@ def load_image(name, colorkey=None):
             colorkey = image.get_at((0, 0))
         image.set_colorkey(colorkey)
     return image
+
 
 FPS = 50
 clock = pygame.time.Clock()
@@ -31,6 +33,7 @@ all_sprites = pygame.sprite.Group()
 au = 10
 och = 0
 maxoch = 0
+muss = True
 fl = False
 ids = ''
 pg.init()
@@ -78,7 +81,7 @@ class InputBox:
         return self.text
 
     def draw(self, screen):
-        screen.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
+        screen.blit(self.txt_surface, (self.rect.x + 5, self.rect.y + 5))
         pg.draw.rect(screen, self.color, self.rect, 2)
 
 
@@ -87,13 +90,13 @@ def terminate():
     sys.exit()
 
 
-def buttons(screen, button, button1, button2, button3):
-    sp = ['Играть', 'Описание', 'Таблица лидеров', 'Выход']
-    spp = [button, button1, button2, button3]
+def buttons(screen, button, button1, button2, button3, button4):
+    sp = ['Играть', 'Описание', 'Таблица лидеров', 'Выкл/вкл звук', 'Выход']
+    spp = [button, button1, button2, button3, button4]
     font = pygame.font.Font(pygame.font.match_font('monsterrat'), 30)
 
     # потом картинку для кнопки сделаю maybe
-    for i in range(4):
+    for i in range(5):
         pygame.draw.rect(screen, pygame.Color('lightblue'), spp[i])
         string = font.render(sp[i], 1, pygame.Color('darkblue'))
         intro_rect = string.get_rect()
@@ -104,7 +107,10 @@ def buttons(screen, button, button1, button2, button3):
                 intro_rect.left = 345 // 2 - (intro_rect.height // 2) + 35
             else:
                 intro_rect.left = 345 // 2 - (intro_rect.height // 2)
-        intro_rect.top = 115 + 100 * i
+
+        intro_rect.top = 50 + 100 * i
+        if i == 3:
+            intro_rect.left = 345 // 2 - (intro_rect.height // 2) + 10
         screen.blit(string, intro_rect)
 
 
@@ -136,6 +142,7 @@ def button_fon():
 def registration(screen):
     global ids
     global maxoch
+    pygame.display.set_caption('Дайвер')
     clock = pygame.time.Clock()
     font = pg.font.Font(pg.font.match_font('monsterrat'), 30)
     log = font.render('Логин', 1, pygame.Color('lightblue'))
@@ -204,21 +211,24 @@ def registration(screen):
 
 def start_screen(screen):
     fl = False
-    intro_text = ["ДАЙВЕР В ГЛУБИНАХ", "",
+    global muss
+    pygame.mixer.Channel(0).play(pygame.mixer.Sound('data/mus.mp3'), -1)
+    intro_text = ["                    ДАЙВЕР В ГЛУБИНАХ", "",
                   "Правила игры",
-                  "нажимайте кнопки <<влево>> и <<вправо>>,",
+                  "нажимайте стрелки на клавиатуре",
                   "чтобы обходить препятствия и получать",
                   "кислород для жизни."]
 
     # buttnos (mne len' perecluchat rascladky)
-    button, button1 = pygame.Rect(145, 100, 200, 50), pygame.Rect(145, 200, 200, 50)
-    button2, button3 = pygame.Rect(145, 300, 200, 50), pygame.Rect(145, 400, 200, 50)
+    button, button1 = pygame.Rect(145, 40, 200, 50), pygame.Rect(145, 140, 200, 50)
+    button2, button3 = pygame.Rect(145, 240, 200, 50), pygame.Rect(145, 340, 200, 50)
+    button4 = pygame.Rect(145, 440, 200, 50)
 
     fon = pygame.transform.scale(load_image('okean.jpg'), (500, 500))
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(pygame.font.match_font('monsterrat'), 30)
     text_coord = 50
-    buttons(screen, button, button1, button2, button3)
+    buttons(screen, button, button1, button2, button3, button4)
 
     while True:
         for event in pygame.event.get():
@@ -226,6 +236,13 @@ def start_screen(screen):
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if button3.collidepoint(event.pos):
+                    if muss:
+                        pygame.mixer.stop()
+                        muss = False
+                    else:
+                        pygame.mixer.Channel(0).play(pygame.mixer.Sound('data/mus.mp3'), -1)
+                        muss = True
+                if button4.collidepoint(event.pos):
                     terminate()
                 else:
                     ret = pygame.Rect(450, 10, 45, 45)
@@ -250,6 +267,8 @@ def start_screen(screen):
                                     WHERE id > 0""").fetchall()
                         data = sorted(text, reverse=True, key=lambda x: int(x[1]))
                         liders = []
+                        liders.append(['имя', '     очки'])
+                        liders.append(['', ''])
                         for y in range(len(data)):
                             liders.append([str(data[y][0]), str(data[y][1])])
                             if y == 20:
@@ -435,9 +454,20 @@ def ochki():
     och += 1
 
 
-def smert(screen):
+def vod():
+    pg.mixer.music.load('data/voda.mp3')
+    pg.mixer.music.play()
+
+
+def smert(screen, muss):
     global au
+    running = False
     if au < 0:
+        if muss:
+            pg.mixer.music.load('data/main.mp3')
+            pg.mixer.music.play()
+        running = True
+    while running:
         fon = pygame.transform.scale(load_image('trup4.jpg'), (500, 500))
         font = pg.font.Font(pg.font.match_font('monsterrat'), 30)
         screen.blit(fon, (0, 0))
@@ -461,14 +491,17 @@ def smert(screen):
                     choose_level(screen, fon, text_coord, font)
             elif event.type == pygame.KEYDOWN:
                 pass
+        pygame.display.flip()
+        clock.tick(FPS)
 
 
 class Character(pygame.sprite.Sprite):
-    def __init__(self, size, image, *group):
+    def __init__(self, size, image, muss, *group):
         super().__init__(*group)
         self.image = image  # и размеры
         self.rect = self.image.get_rect()
         self.rect.x = 245
+        self.fl = muss
         self.rect.y = 10
 
     def update(self, nap, auu):
@@ -477,7 +510,7 @@ class Character(pygame.sprite.Sprite):
         if nap == 'right':
             self.rect = self.rect.move(10, 0)
         if nap == 'up' and self.rect.top >= 0:
-            self.rect = self.rect.move(0, -10)
+            self.rect = self.rect.move(0, -5)
         if nap == 'down':
             self.rect = self.rect.move(0, 10)
         if self.rect.y >= 412:
@@ -486,14 +519,21 @@ class Character(pygame.sprite.Sprite):
             self.rect = self.rect.move(-465, 0)
         if self.rect.x <= -5:
             self.rect = self.rect.move(455, 0)
-        self.rect = self.rect.move(0, 3)
+        if nap == 'sass':
+            self.rect = self.rect.move(0, 3)
         if pygame.sprite.spritecollideany(self, airs):
+            if self.fl:
+                vod()
             airs.remove(pygame.sprite.spritecollideany(self, airs))
             vozduh()
         if pygame.sprite.spritecollideany(self, angry):
+            if self.fl:
+                vod()
             angry.remove(pygame.sprite.spritecollideany(self, angry))
             minus_vozduh()
         if pygame.sprite.spritecollideany(self, fish):
+            if self.fl:
+                vod()
             fish.remove(pygame.sprite.spritecollideany(self, fish))
             ochki()
 
@@ -546,8 +586,8 @@ def main(screen, level):
 
     image = load_image("chel.png", -1)
     image = pygame.transform.scale(image, (45, 85))
-    Character(size, image, chr)
-    Character(size, image, all_sprites)
+    Character(size, image, muss, chr)
+    Character(size, image, muss, all_sprites)
     sprites = airs
     sprite = chr
     sprut = angry
@@ -597,7 +637,7 @@ def main(screen, level):
             au -= 5
             timer = pygame.time.get_ticks
             deadline = timer() + sec
-            sprite.update('sas', au)
+            sprite.update('sass', au)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -623,11 +663,12 @@ def main(screen, level):
                     sprite.update('down', au)
                 elif event.key == pygame.K_UP:
                     sprite.update('up', au)
+        sprite.update('sas', au)
         nadpisi(string, intro_rect, sstring, iintro_rect, sprite, sprites, ret,
                 sprut, spru, stroka, rectal)
         sstring = font.render(f'Запас кислорода: {au}/100', 1, pygame.Color('darkblue'))
         stroka = font.render(f'Очки: {och}', 1, pygame.Color('darkblue'))
-        smert(screen)
+        smert(screen, muss)
         pygame.display.flip()
         clock.tick(FPS)
         vrema += 1
