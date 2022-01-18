@@ -219,7 +219,6 @@ def start_screen(screen):
                   "чтобы обходить препятствия и получать",
                   "кислород для жизни."]
 
-    # buttnos (mne len' perecluchat rascladky)
     button, button1 = pygame.Rect(145, 40, 200, 50), pygame.Rect(145, 140, 200, 50)
     button2, button3 = pygame.Rect(145, 240, 200, 50), pygame.Rect(145, 340, 200, 50)
     button4 = pygame.Rect(145, 440, 200, 50)
@@ -664,7 +663,6 @@ def main(screen, level):
                 elif event.key == pygame.K_UP:
                     sprite.update('up', au)
         sprite.update('sas', au)
-        # comment
         nadpisi(string, intro_rect, sstring, iintro_rect, sprite, sprites, ret,
                 sprut, spru, stroka, rectal)
         sstring = font.render(f'Запас кислорода: {au}/100', 1, pygame.Color('darkblue'))
