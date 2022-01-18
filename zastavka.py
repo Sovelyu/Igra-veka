@@ -219,6 +219,7 @@ def start_screen(screen):
                   "чтобы обходить препятствия и получать",
                   "кислород для жизни."]
 
+    # buttnos (mne len' perecluchat rascladky)
     button, button1 = pygame.Rect(145, 40, 200, 50), pygame.Rect(145, 140, 200, 50)
     button2, button3 = pygame.Rect(145, 240, 200, 50), pygame.Rect(145, 340, 200, 50)
     button4 = pygame.Rect(145, 440, 200, 50)
