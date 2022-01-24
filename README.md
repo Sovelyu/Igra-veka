@@ -1,2 +1,0 @@
-# Igra-veka
-aaaaaaaa
