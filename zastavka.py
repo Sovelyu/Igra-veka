@@ -10,7 +10,6 @@ import sqlite3
 def draw(screen):
     fon = pygame.transform.scale(load_image('backg.png'), (500, 500))
     screen.blit(fon, (0, 0))
-    #sas
 
 
 def load_image(name, colorkey=None):
